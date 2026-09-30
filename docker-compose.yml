@@ -1,0 +1,197 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-honeymind}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-honeymind_lab_only_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-honeymind}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U honeymind"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-honeymind}:${POSTGRES_PASSWORD:-honeymind_lab_only_change_me}@postgres:5432/${POSTGRES_DB:-honeymind}
+      DATABASE_URL_SYNC: postgresql://${POSTGRES_USER:-honeymind}:${POSTGRES_PASSWORD:-honeymind_lab_only_change_me}@postgres:5432/${POSTGRES_DB:-honeymind}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend_net
+      - honeypot_net
+    read_only: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3001:3000"
+    depends_on:
+      - backend
+    networks:
+      - backend_net
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  honeypot-ssh:
+    build:
+      context: ./honeypots/ssh
+      dockerfile: Dockerfile
+    environment:
+      BACKEND_INGEST_URL: http://backend:8000/ingest/events
+      HONEYPOT_SERVICE: ssh
+      DECEPTION_MODE: adaptive
+    ports:
+      - "2222:2222"
+    depends_on:
+      - backend
+    networks:
+      honeypot_net:
+        aliases:
+          - honeypot-ssh
+    read_only: true
+    tmpfs:
+      - /tmp:size=32M,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+          pids: 64
+
+  honeypot-http:
+    build:
+      context: ./honeypots/http
+      dockerfile: Dockerfile
+    environment:
+      BACKEND_INGEST_URL: http://backend:8000/ingest/events
+      HONEYPOT_SERVICE: http
+      DECEPTION_MODE: adaptive
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    networks:
+      honeypot_net:
+        aliases:
+          - honeypot-http
+    read_only: true
+    tmpfs:
+      - /tmp:size=32M,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+          pids: 64
+
+  honeypot-api:
+    build:
+      context: ./honeypots/api
+      dockerfile: Dockerfile
+    environment:
+      BACKEND_INGEST_URL: http://backend:8000/ingest/events
+      HONEYPOT_SERVICE: api
+      DECEPTION_MODE: adaptive
+    ports:
+      - "8081:8081"
+    depends_on:
+      - backend
+    networks:
+      honeypot_net:
+        aliases:
+          - honeypot-api
+    read_only: true
+    tmpfs:
+      - /tmp:size=32M,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+          pids: 64
+
+  actors:
+    build:
+      context: .
+      dockerfile: actors/Dockerfile
+    environment:
+      SSH_HOST: honeypot-ssh
+      SSH_PORT: "2222"
+      HTTP_URL: http://honeypot-http:8080
+      API_URL: http://honeypot-api:8081
+      BACKEND_URL: http://backend:8000
+      ALLOWLIST: honeypot-ssh,honeypot-http,honeypot-api,backend
+    depends_on:
+      - honeypot-ssh
+      - honeypot-http
+      - honeypot-api
+      - backend
+    networks:
+      - honeypot_net
+      - backend_net
+    profiles:
+      - actors
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+networks:
+  backend_net:
+    driver: bridge
+    internal: false
+  honeypot_net:
+    driver: bridge
+    # Honeypots share this network; no host network mode.
+    # Outbound Internet is not required for honeypot operation.
+
+volumes:
+  pgdata:

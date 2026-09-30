@@ -1,0 +1,58 @@
+{
+  "rq2_static_vs_adaptive": {
+    "static": {
+      "session_duration": 0.34,
+      "interactions": 7.0,
+      "interaction_depth": 6.0,
+      "unique_resources": 0.5,
+      "deception_artifacts_accessed": 0.0,
+      "behavioral_diversity": 4.0
+    },
+    "adaptive": {
+      "session_duration": 4.975,
+      "interactions": 10.5,
+      "interaction_depth": 9.5,
+      "unique_resources": 6.0,
+      "deception_artifacts_accessed": 3.0,
+      "behavioral_diversity": 6.5
+    }
+  },
+  "rq1_actor_classification": {
+    "precision_macro": 1.0,
+    "recall_macro": 1.0,
+    "f1_macro": 1.0,
+    "confusion_matrix": [
+      [
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        0
+      ],
+      [
+        0,
+        0,
+        3
+      ]
+    ],
+    "labels": [
+      "HUMAN",
+      "SCRIPTED_AUTOMATION",
+      "SIMULATED_LLM_AGENT"
+    ],
+    "report": "                     precision    recall  f1-score   support\n\n              HUMAN       1.00      1.00      1.00         2\nSCRIPTED_AUTOMATION       1.00      1.00      1.00         4\nSIMULATED_LLM_AGENT       1.00      1.00      1.00         3\n\n           accuracy                           1.00         9\n          macro avg       1.00      1.00      1.00         9\n       weighted avg       1.00      1.00      1.00         9\n"
+  },
+  "rq5_hybrid_representation": {
+    "behavioral_separation": 0.8586968962027816,
+    "embedding_separation": 0.6331013005616526,
+    "hybrid_separation": 0.8583274740348953
+  },
+  "notes": {
+    "rq3": "Top signals: delay variance, unique_command_ratio, deception_interaction_count, semantic progression",
+    "rq4": "LLM/human more likely to follow AI_TRAP to backup-01; scanners rarely branch",
+    "caveat": "AI-agent detection is experimental and probabilistic"
+  }
+}
