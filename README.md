@@ -54,7 +54,7 @@ Full notes: [`infrastructure/THREAT_MODEL.md`](./infrastructure/THREAT_MODEL.md)
 ## 6. Installation
 
 ```bash
-git clone <repo-url> honeymind
+git clone https://github.com/aprameyak/honeymind.git
 cd honeymind
 cp .env.example .env
 ```
@@ -145,7 +145,7 @@ Interactive OpenAPI: http://localhost:8000/docs
 
 Pages: Overview · Live Sessions · Session Explorer · Clusters · Anomalies · Experiments · AI Analysis
 
-Screenshots: run the stack and capture from http://localhost:3000 (placeholders until first local run).
+Screenshots: run the stack and capture from http://localhost:3001.
 
 ## 13. Current Limitations
 
@@ -182,4 +182,5 @@ Phase checklist lives in `ARCHITECTURE.md`.
 
 ## License
 
-Research / educational lab software. Use only in isolated environments you own or have permission to operate.
+MIT. Research / educational lab software — use only in isolated environments you own or have permission to operate.
+
