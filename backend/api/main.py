@@ -56,13 +56,23 @@ logger.setLevel(logging.INFO)
 
 app = FastAPI(title="HoneyMind API", version="1.0.0", default_response_class=ORJSONResponse)
 
+_cors = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors or ["http://localhost:3001"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def _require_ingest_token(request: Request) -> None:
+    expected = settings.ingest_token.strip()
+    if not expected:
+        return
+    got = request.headers.get("x-ingest-token", "")
+    if got != expected:
+        raise HTTPException(status_code=401, detail="invalid ingest token")
 
 _rate_buckets: dict[str, deque] = defaultdict(deque)
 deception_engine = DeceptionEngine()
@@ -95,7 +105,8 @@ async def health() -> dict[str, str]:
 
 
 @app.post("/ingest/events")
-async def ingest_event(payload: EventIngest, db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
+async def ingest_event(request: Request, payload: EventIngest, db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
+    _require_ingest_token(request)
     svc = TelemetryService(db)
     session, event = await svc.ingest(payload)
     logger.info("event_ingested", extra={"session_id": str(session.id), "action": event.action[:80]})
@@ -344,6 +355,7 @@ async def session_analysis(session_id: uuid.UUID, db: AsyncSession = Depends(get
 
 @app.post("/ingest/artifact")
 async def ingest_artifact_interaction(
+    request: Request,
     session_id: uuid.UUID,
     artifact_name: str,
     subsequent_actions: list[str] | None = None,
@@ -351,6 +363,7 @@ async def ingest_artifact_interaction(
     influenced_navigation: bool = False,
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, str]:
+    _require_ingest_token(request)
     art = (
         await db.execute(select(DeceptionArtifact).where(DeceptionArtifact.name == artifact_name))
     ).scalar_one_or_none()

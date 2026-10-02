@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     rate_limit_per_minute: int = 120
     max_request_bytes: int = 65536
     honeymind_env: str = "lab"
+    ingest_token: str = ""
+    cors_origins: str = "http://localhost:3001,http://localhost:3000"
 
     @field_validator("llm_api_key")
     @classmethod
