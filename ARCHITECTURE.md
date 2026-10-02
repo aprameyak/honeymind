@@ -182,7 +182,6 @@ honeymind/
 ├── actors/{scripted,llm}/
 ├── infrastructure/
 ├── datasets/
-├── notebooks/
 └── tests/
 ```
 
