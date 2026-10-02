@@ -9,7 +9,7 @@ Actor-class labels from the ML stack are experimental. Do not treat them as proo
 [`ARCHITECTURE.md`](./ARCHITECTURE.md)
 
 ```text
-Simulated Actors → Deception Gateway → SSH/HTTP/API Honeypots
+Simulated Actors → SSH/HTTP/API Honeypots
         → Event Pipeline → Session Engine → AI/ML Engine
         → Deception Policy → Analytics API → Dashboard
 ```

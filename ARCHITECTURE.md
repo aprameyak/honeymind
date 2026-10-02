@@ -6,28 +6,27 @@ Lab for adaptive honeypots and attacker-session analysis. Isolated defensive lab
 
 | Component | Responsibility |
 |-----------|----------------|
-| **Deception Gateway** | Routes inbound lab traffic to SSH / HTTP / Fake API honeypots; enforces rate limits |
-| **Honeypot Layer** | Contained decoy services (SSH emulator, HTTP decoy, fake REST API) |
+| **Honeypot Layer** | Contained decoy services (SSH emulator, HTTP decoy, fake REST API); published lab ports |
 | **Event Pipeline** | Normalizes raw interactions into typed telemetry events |
 | **Session Engine** | Groups events into sessions; builds semantic action sequences and summaries |
 | **EnvironmentState** | Maintains coherent fictional company/network world state |
 | **DeceptionEngine** | Deterministic + optional LLM synthetic responses with strict validation |
-| **DeceptionPolicy** | Rule-based adaptive strategy selection (RL-ready interface) |
+| **DeceptionPolicy** | Rule-based adaptive strategy selection |
 | **EmbeddingService** | Pluggable local embeddings for actions and sessions |
 | **FeatureService** | Behavioral numerical feature vectors |
 | **ClusteringService** | DBSCAN (optional HDBSCAN) unsupervised grouping |
 | **AnomalyDetector** | Isolation Forest session scoring |
 | **ActorClassifier** | Experimental HUMAN / SCRIPTED / LLM_AGENT / UNKNOWN likelihoods |
 | **Experiment Framework** | Safe deception artifact A/B measurement |
-| **Analytics API** | FastAPI REST surface for dashboard and research tooling |
-| **Dashboard** | Next.js SOC-style analytics UI |
+| **Analytics API** | FastAPI REST surface; rate limits and optional ingest token |
+| **Dashboard** | Next.js analytics UI |
 | **Simulated Actors** | Allowlisted lab-only scripted / LLM research agents |
 
 ```
 SIMULATED ACTORS (Human | Scripted | LLM Agent)
         │
         ▼
- DECEPTION GATEWAY ──► SSH / HTTP / Fake API honeypots
+ SSH / HTTP / Fake API honeypots
         │
         ▼
  EVENT PIPELINE ──► SESSION ENGINE ──► Raw + Features + Embeddings
@@ -62,19 +61,19 @@ SIMULATED ACTORS (Human | Scripted | LLM Agent)
 
 **Trust boundaries**
 1. Host OS ↔ Docker bridge (honeypots never get host mounts / privileged / host network)
-2. Honeypot network ↔ Backend network (one-way event ingest via gateway)
+2. Honeypot network ↔ Backend (honeypots POST ingest; optional `x-ingest-token`)
 3. Attacker input ↔ LLM system prompt (never concatenate untrusted text into privileged instructions)
 4. LLM output ↔ honeypot response (structured validation before expose)
 
 ## 3. Containment Boundaries
 
 - No privileged containers; no Docker socket mounts
-- No host networking; dedicated bridge networks with egress deny for honeypots
+- No host networking; `honeypot_net` is `internal: true` (no Internet egress from honeypots)
 - Read-only root filesystems where practical; tmpfs for writable scratch
 - CPU / memory / PID limits on all honeypot services
 - Synthetic secrets only; env validation rejects real-looking production keys at startup
-- Rate limiting and request body size limits on all external-facing ports
-- Simulated actors hard-coded allowlist: `honeypot-ssh`, `honeypot-http`, `honeypot-api`, `localhost` lab ports only
+- Rate limiting and request body size limits on the analytics API
+- Simulated actors allowlist: `honeypot-ssh`, `honeypot-http`, `honeypot-api`, `backend`, `localhost`, `127.0.0.1`
 - LLM has **no tools** for shell, filesystem, Internet, or cloud APIs
 
 ## 4. Database Schema
@@ -182,6 +181,7 @@ honeymind/
 ├── actors/{scripted,llm}/
 ├── infrastructure/
 ├── datasets/
+├── scripts/
 └── tests/
 ```
 

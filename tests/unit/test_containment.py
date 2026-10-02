@@ -36,6 +36,8 @@ def test_frontend_api_url_is_build_arg():
     # Runtime env alone does not bake into the Next.js client bundle.
     env = frontend.get("environment") or {}
     assert "NEXT_PUBLIC_API_URL" not in env
+    example = (ROOT / ".env.example").read_text()
+    assert "NEXT_PUBLIC_API_URL=" in example
 
 
 def test_honeypots_receive_ingest_token_env():
@@ -43,3 +45,10 @@ def test_honeypots_receive_ingest_token_env():
     for name in ("honeypot-ssh", "honeypot-http", "honeypot-api"):
         env = data["services"][name].get("environment") or {}
         assert "INGEST_TOKEN" in env
+
+
+def test_honeypot_network_is_internal():
+    data = yaml.safe_load((ROOT / "docker-compose.yml").read_text())
+    assert data["networks"]["honeypot_net"].get("internal") is True
+    assert "Deception Gateway" not in (ROOT / "README.md").read_text()
+    assert "Deception Gateway" not in (ROOT / "ARCHITECTURE.md").read_text()

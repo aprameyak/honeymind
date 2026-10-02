@@ -21,7 +21,7 @@ Defensive research platform running exclusively in Docker Compose on a researche
 
 | Control | Implementation |
 |---------|----------------|
-| Isolation | Separate `honeypot_net` / `backend_net`; no host networking |
+| Isolation | Separate `honeypot_net` / `backend_net`; honeypot net internal (no egress); no host networking |
 | Least privilege | `cap_drop: ALL`, `no-new-privileges`, non-root honeypot images |
 | Filesystem | Honeypot `read_only: true` + tmpfs `/tmp` |
 | Resources | CPU / memory / PID limits |

@@ -190,11 +190,10 @@ services:
 networks:
   backend_net:
     driver: bridge
-    internal: false
   honeypot_net:
     driver: bridge
-    # Honeypots share this network; no host network mode.
-    # Outbound Internet is not required for honeypot operation.
+    # No default gateway / Internet egress; honeypots reach backend on this net only.
+    internal: true
 
 volumes:
   pgdata:

@@ -13,7 +13,7 @@ class PolicyDecision:
 
 
 class DeceptionPolicy:
-    """Deterministic rule-based adaptive deception. Bandit/RL-ready interface."""
+    """Deterministic rule-based adaptive deception policy."""
 
     def select(
         self,
