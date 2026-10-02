@@ -130,4 +130,4 @@ cd .. && PYTHONPATH=backend:tests:. pytest tests/ -q
 
 ## License
 
-MIT. Lab / research use only in environments you own or have permission to operate.
+MIT. Lab use only on networks you own or have permission to run.
