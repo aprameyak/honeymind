@@ -108,7 +108,7 @@ OpenAPI: http://localhost:8000/docs
 | GET | `/analytics/anomalies` | Anomalies |
 | GET | `/experiments` | Deception experiments |
 | POST | `/analysis/recompute` | Rebuild features/ML |
-| POST | `/ingest/events` | Telemetry |
+| POST | `/ingest/events` | Telemetry (optional `x-ingest-token` if `INGEST_TOKEN` set) |
 | POST | `/deception/respond` | Synthetic responses |
 
 Dashboard pages live at http://localhost:3001

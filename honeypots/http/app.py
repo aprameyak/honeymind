@@ -12,14 +12,21 @@ from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 BACKEND = os.getenv("BACKEND_INGEST_URL", "http://backend:8000/ingest/events")
 SERVICE = os.getenv("HONEYPOT_SERVICE", "http")
 MODE = os.getenv("DECEPTION_MODE", "adaptive")
+INGEST_TOKEN = os.getenv("INGEST_TOKEN", "").strip()
 
 app = FastAPI(title="HoneyMind HTTP Honeypot")
+
+
+def _ingest_headers() -> dict[str, str]:
+    if INGEST_TOKEN:
+        return {"x-ingest-token": INGEST_TOKEN}
+    return {}
 
 
 async def emit(payload: dict[str, Any]) -> None:
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            await client.post(BACKEND, json=payload)
+            await client.post(BACKEND, json=payload, headers=_ingest_headers())
     except Exception:
         pass
 

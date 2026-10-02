@@ -26,3 +26,20 @@ def test_compose_no_privileged_or_docker_socket():
 def test_env_example_has_no_aws_keys():
     text = (ROOT / ".env.example").read_text()
     assert "AKIA" not in text
+
+
+def test_frontend_api_url_is_build_arg():
+    data = yaml.safe_load((ROOT / "docker-compose.yml").read_text())
+    frontend = data["services"]["frontend"]
+    args = (frontend.get("build") or {}).get("args") or {}
+    assert "NEXT_PUBLIC_API_URL" in args
+    # Runtime env alone does not bake into the Next.js client bundle.
+    env = frontend.get("environment") or {}
+    assert "NEXT_PUBLIC_API_URL" not in env
+
+
+def test_honeypots_receive_ingest_token_env():
+    data = yaml.safe_load((ROOT / "docker-compose.yml").read_text())
+    for name in ("honeypot-ssh", "honeypot-http", "honeypot-api"):
+        env = data["services"][name].get("environment") or {}
+        assert "INGEST_TOKEN" in env

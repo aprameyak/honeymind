@@ -49,8 +49,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
     ports:
       - "3001:3000"
     depends_on:
@@ -71,6 +71,7 @@ services:
       dockerfile: Dockerfile
     environment:
       BACKEND_INGEST_URL: http://backend:8000/ingest/events
+      INGEST_TOKEN: ${INGEST_TOKEN:-}
       HONEYPOT_SERVICE: ssh
       DECEPTION_MODE: adaptive
     ports:
@@ -101,6 +102,7 @@ services:
       dockerfile: Dockerfile
     environment:
       BACKEND_INGEST_URL: http://backend:8000/ingest/events
+      INGEST_TOKEN: ${INGEST_TOKEN:-}
       HONEYPOT_SERVICE: http
       DECEPTION_MODE: adaptive
     ports:
@@ -131,6 +133,7 @@ services:
       dockerfile: Dockerfile
     environment:
       BACKEND_INGEST_URL: http://backend:8000/ingest/events
+      INGEST_TOKEN: ${INGEST_TOKEN:-}
       HONEYPOT_SERVICE: api
       DECEPTION_MODE: adaptive
     ports:

@@ -87,6 +87,27 @@ async def test_recompute_empty(client):
 
 
 @pytest.mark.asyncio
+async def test_ingest_token_enforced(client, monkeypatch):
+    from config import settings
+
+    monkeypatch.setattr(settings, "ingest_token", "lab-secret")
+    sid = str(uuid.uuid4())
+    body = {
+        "session_id": sid,
+        "service": "ssh",
+        "action_type": "command",
+        "action": "id",
+        "response_type": "deterministic",
+        "latency_ms": 1,
+        "session_depth": 1,
+    }
+    denied = await client.post("/ingest/events", json=body)
+    assert denied.status_code == 401
+    ok = await client.post("/ingest/events", json=body, headers={"x-ingest-token": "lab-secret"})
+    assert ok.status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_rate_limit_headers_size(client):
     r = await client.post(
         "/ingest/events",

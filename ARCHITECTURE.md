@@ -1,6 +1,6 @@
 # HoneyMind Architecture
 
-Research-grade AI-adaptive honeypot and autonomous attacker analysis platform for **isolated defensive laboratory use only**.
+Lab for adaptive honeypots and attacker-session analysis. Isolated defensive lab use only.
 
 ## 1. System Components
 
@@ -185,20 +185,7 @@ honeymind/
 └── tests/
 ```
 
-## 9. Implementation Checklist
-
-- [x] ARCHITECTURE.md
-- [x] Phase 1 — Infrastructure (compose, DB, API, UI shell, honeypots)
-- [x] Phase 2 — Telemetry (sessions, events, explorer)
-- [x] Phase 3 — Feature engineering
-- [x] Phase 4 — Embeddings + clustering + anomaly
-- [x] Phase 5 — Synthetic env + deception engine
-- [x] Phase 6 — Actors + experiments + classification
-- [x] Phase 7 — Adaptive deception policy
-- [x] Phase 8 — Evaluation harness + metrics
-- [x] Tests + README + push
-
-## 10. Research Questions
+## 9. Research Questions
 
 - **RQ1** Semantic+behavioral distinguish LLM agents vs automation?
 - **RQ2** Adaptive honeypots increase engagement vs static?
