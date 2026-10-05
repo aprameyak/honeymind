@@ -131,3 +131,27 @@ cd .. && PYTHONPATH=backend:tests:. pytest tests/ -q
 ## License
 
 MIT. Lab use only on networks you own or have permission to run.
+
+## Installation
+
+```bash
+npm install
+npm run dev
+```
+
+## Development
+
+The app uses React with TypeScript. Key directories:
+
+- `src/components/` - React components
+- `src/lib/` - Utility functions
+- `src/pages/` - Page components
+
+Run tests:
+```bash
+npm test
+```
+
+## Contributing
+
+Issues and PRs welcome. Keep PRs focused on single features/fixes.
