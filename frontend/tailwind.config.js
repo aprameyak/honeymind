@@ -16,9 +16,6 @@ module.exports = {
         display: ["IBM Plex Sans", "Segoe UI", "sans-serif"],
         mono: ["IBM Plex Mono", "ui-monospace", "monospace"],
       },
-      backgroundImage: {
-        grid: "radial-gradient(circle at 1px 1px, rgba(62,207,142,0.12) 1px, transparent 0)",
-      },
     },
   },
   plugins: [],
